@@ -21,31 +21,32 @@ namespace TaskMonitoring.Data
             modelBuilder.Entity<ListEmployee>()
                         .HasOne(m => m.Project)
                         .WithMany(t => t.ListEmployee)
-                        .HasForeignKey(m => m.ProjectId);
+                        .HasForeignKey(m => m.ProjectId)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ListEmployee>()
                         .HasOne(m => m.ApplicationUser)
                         .WithMany(t => t.ListEmployee)
                         .HasForeignKey(m => m.ApplicationUserId)
-                        ;
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Module>()
                         .HasOne(m => m.Project)
                         .WithMany(t => t.Module)
                         .HasForeignKey(m => m.ProjectId)
-                        ;
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Task>()
                         .HasOne(m => m.Module)
                         .WithMany(t => t.Task)
                         .HasForeignKey(m => m.ModuleId)
-                        ;
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Task>()
                         .HasOne(m => m.ApplicationUser)
                         .WithMany(t => t.Task)
                         .HasForeignKey(m => m.ApplicationUserId)
-                        ;
+                        .OnDelete(DeleteBehavior.Cascade);
             base.OnModelCreating(modelBuilder);
 
         }

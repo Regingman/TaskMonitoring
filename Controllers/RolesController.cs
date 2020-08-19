@@ -24,8 +24,11 @@ namespace TaskMonitoring.Controllers
 
         public IActionResult Index() => View(_roleManager.Roles.ToList());
 
-       // [Authorize(Roles = "ADMIN")]
+        // [Authorize(Roles = "ADMIN")]
         public IActionResult Create() => View();
+
+
+        public IActionResult UserCreate() => View();
         [HttpPost]
         public async Task<IActionResult> Create(string name)
         {
@@ -35,6 +38,29 @@ namespace TaskMonitoring.Controllers
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+            }
+            return View(name);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UserCreate(string name, string password)
+        {
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(password))
+            {
+
+                var user = new ApplicationUser { UserName = name, Email = name };
+                IdentityResult result = await _userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("UserList");
                 }
                 else
                 {
@@ -59,10 +85,37 @@ namespace TaskMonitoring.Controllers
             return RedirectToAction("Index");
         }
 
-       // [Authorize(Roles = "admin")]
+        // [Authorize(Roles = "admin")]
         public IActionResult UserList() => View(_userManager.Users.ToList());
 
-      //  [Authorize(Roles = "admin")]
+        [HttpPost]
+        public async Task<IActionResult> UserDelete(string id)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                IdentityResult result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                    return RedirectToAction("UserList");
+                else
+                    return NotFound();
+            }
+            return RedirectToAction("UserList");
+        }
+
+        public async Task<IActionResult> UserEdit(string userId)
+        {
+            // получаем пользователя
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                return View(user);
+            }
+
+            return NotFound();
+        }
+
+        //  [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(string userId)
         {
             // получаем пользователя
@@ -85,7 +138,27 @@ namespace TaskMonitoring.Controllers
             return NotFound();
         }
 
-       // [Authorize(Roles = "admin")]
+        [HttpPost]
+        public async Task<IActionResult> UserEdit(string userId, [Bind("Email,UserName,PhoneNumber")] ApplicationUser user)
+        {
+            /* if (userId != user.Id)
+             {
+                 return NotFound();
+             }*/
+            if (ModelState.IsValid)
+                if (user != null)
+                {
+
+                    ApplicationUser userTemp = await _userManager.FindByIdAsync(userId);
+                    await _userManager.SetUserNameAsync(userTemp, user.UserName);
+                    await _userManager.SetPhoneNumberAsync(userTemp, user.PhoneNumber);
+                    await _userManager.SetEmailAsync(userTemp, user.Email);
+                    return RedirectToAction("UserList");
+                }
+            return NotFound();
+        }
+
+        // [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(string userId, List<string> roles)
         {

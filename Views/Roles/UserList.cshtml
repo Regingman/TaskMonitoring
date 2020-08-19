@@ -1,14 +1,48 @@
 ﻿@model IEnumerable<TaskMonitoring.Data.ApplicationUser>
 
 <h2>Список пользователей</h2>
+
+<p>
+    <a asp-action="UserCreate">Create New</a>
+</p>
 <table class="table">
-    @foreach (var user in Model)
-    {
+    <thead>
         <tr>
-            <td>@user.Email</td>
-            <td>
-                <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-userid="@user.Id">Права доступа</a>
-            </td>
+            <th>
+                ФИО
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Номер телефона
+            </th>
+            <th></th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>@user.PhoneNumber</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-action="UserEdit" asp-route-userid="@user.Id">Edit</a> |
+
+                </td>
+                <td>
+                    <form asp-action="UserDelete" asp-route-id="@user.Id" method="post">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            Удалить
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-userid="@user.Id">Права доступа</a>
+                </td>
+            </tr>
+        }
 </table>
+
+<a asp-action="Index">Роли</a>
